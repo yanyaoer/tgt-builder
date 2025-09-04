@@ -1,17 +1,8 @@
 name: CI macOS
 
 on:
-  workflow_dispatch:
   push:
-    branches-ignore: [ 'dependabot/**' ]
-    tags-ignore: [ '**' ]
-    paths:
-      - 'src/**'
-      - 'Cargo.lock'
-      - 'Cargo.toml'
-      - 'rustfmt.toml'
-      - 'config/**'
-      - '.github/workflows/**'
+    branches: ['**']
   pull_request:
     branches: [ '**' ]
     paths:
@@ -113,3 +104,36 @@ jobs:
       #     name: ${{ runner.os }}-artifact
       #     path: ./
       #     overwrite: true
+
+  build_release:
+    runs-on: macos-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Run cargo build
+        run: cargo build --release --no-default-features --verbose --features download-tdlib
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tgt-macos
+          path: target/release/tgt
+
+  release:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    needs: build_release
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tgt-macos
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly-macos
+          name: "Nightly macOS build"
+          prerelease: true
+          files: tgt
