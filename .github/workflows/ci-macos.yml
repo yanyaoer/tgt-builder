@@ -139,8 +139,8 @@ jobs:
           path: artifacts
       - name: Rename binaries
         run: |
-          mv artifacts/tgt-macos-x86_64/tgt artifacts/tgt-macos-x86_64
-          mv artifacts/tgt-macos-arm64/tgt artifacts/tgt-macos-arm64
+          mv artifacts/tgt-macos-x86_64/tgt artifacts/tgt-macos-x86_64.bin
+          mv artifacts/tgt-macos-arm64/tgt artifacts/tgt-macos-arm64.bin
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
@@ -148,5 +148,5 @@ jobs:
           name: "Nightly macOS build"
           prerelease: true
           files: |
-            artifacts/tgt-macos-x86_64
-            artifacts/tgt-macos-arm64
+            artifacts/tgt-macos-x86_64.bin
+            artifacts/tgt-macos-arm64.bin
